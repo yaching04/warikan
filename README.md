@@ -51,6 +51,7 @@
 | 同期（任意） | Firebase Anonymous Auth、Cloud Firestore（`asia-northeast1`）。SDK は共有を使うときだけ CDN から動的 import |
 | ホスティング | GitHub Pages |
 | テスト | Node.js（`assert`）、`@firebase/rules-unit-testing` + Firestore エミュレータ、Puppeteer（`puppeteer-core` + Chrome） |
+| CI | GitHub Actions（lint、ユニットテスト、ルールのテスト） |
 
 ## アーキテクチャ
 
@@ -173,7 +174,7 @@ Firebase の Web 設定（`apiKey` など）は、ブラウザから使う以上
 | E2E | `npm run test:e2e` | Puppeteer で画面を操作。`test/e2e/` の機能別の spec（精算・台帳・履歴・設定・項目・共有） |
 | E2E（同期） | `npm run test:e2e:emulator` | Auth / Firestore エミュレータを使う共有の spec（`// @emulator` の付いたもの） |
 
-テストはいまのところローカルで実行しています（GitHub Actions の設定は準備中）。
+CI（GitHub Actions）では、push と pull request で lint・ユニット・ルールのテストを動かしています。E2E はフォントや描画の差で結果が揺れやすいため、いまはローカルで実行しています。
 
 E2E の実行には Chrome が必要です（既定は `/usr/bin/google-chrome`、`CHROME=...` で変更）。テストは時刻を 2026年11月15日 12:00 JST に固定して動きます。
 
@@ -215,6 +216,7 @@ npm test           # lint + ユニットテスト
 │   ├── serve.js        静的サーバー（npm start と E2E）
 │   ├── e2e/            E2E（helpers.js と機能別の spec、run.js で一括実行）
 │   └── visual/         見た目の確認用スクリーンショット、コントラストの計算
+├── .github/workflows/  CI
 ├── CHANGELOG.md
 └── LICENSE
 ```

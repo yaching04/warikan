@@ -12,7 +12,7 @@
 
 - コード: 使っていない関数と変数を削除、ボタン処理を ACTIONS 表に整理、コメントを整理
 - テスト: 版ごとの E2E を `test/e2e/` に機能別にまとめ、共通部分を `helpers.js` に。版の照合を1か所に
-- `package.json`（npm scripts）、ESLintを追加
+- `package.json`（npm scripts）、ESLint、GitHub Actions（lint・ユニット・ルール）を追加
 - README を書き直し、LICENSE（MIT）とこの CHANGELOG を追加
 
 ## v2.0 — ふたりで使う仕組みの仕上げ（2026-11-18〜19）

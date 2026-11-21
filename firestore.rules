@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function householdPath(hid) {
+      return /databases/$(database)/documents/households/$(hid);
+    }
+
+    function householdData(hid) {
+      return get(householdPath(hid)).data;
+    }
+
+    function isMember(hid) {
+      return signedIn()
+        && exists(householdPath(hid))
+        && request.auth.uid in householdData(hid).members;
+    }
+
+    function isJoin() {
+      return signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['members', 'joinPresentedToken'])
+        && request.resource.data.joinPresentedToken is string
+        && request.resource.data.joinPresentedToken == resource.data.inviteToken
+        && request.resource.data.inviteToken == resource.data.inviteToken
+        && resource.data.members.size() < 2
+        && request.resource.data.members.size() == resource.data.members.size() + 1
+        && request.resource.data.members.keys().hasAll(resource.data.members.keys())
+        && request.auth.uid in request.resource.data.members
+        && !(request.auth.uid in resource.data.members);
+    }
+
+    match /households/{hid} {
+      allow get: if isMember(hid);
+      allow list: if false;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll(['members', 'inviteToken', 'createdAt', 'hostName'])
+        && request.resource.data.inviteToken is string
+        && request.resource.data.inviteToken.size() >= 16
+        && request.resource.data.members.keys().hasOnly([request.auth.uid])
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members.size() == 1;
+
+      allow update: if isJoin();
+      allow delete: if false;
+
+      match /invite/{token} {
+        allow get: if signedIn()
+          && token == resource.data.inviteToken
+          && resource.data.inviteToken is string;
+        allow list: if false;
+        allow create, update: if isMember(hid)
+          && request.resource.data.inviteToken is string
+          && request.resource.data.inviteToken == token;
+        allow delete: if isMember(hid);
+      }
+
+      match /payments/{id} {
+        allow read, write: if isMember(hid);
+      }
+      match /items/{id} {
+        allow read, write: if isMember(hid);
+      }
+      match /ledger/{id} {
+        allow read, write: if isMember(hid);
+      }
+      match /settlements/{id} {
+        allow read, write: if isMember(hid);
+      }
+      match /meta/{id} {
+        allow read, write: if isMember(hid);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "warikan",
+  "version": "2.1.1",
+  "private": true,
+  "description": "ふたりの毎月の支払いを記録して、月末の精算額を出す PWA（静的サイト、ビルドなし）",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/yaching04/warikan.git" },
+  "homepage": "https://yaching04.github.io/warikan/",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node test/serve.js",
+    "lint": "eslint .",
+    "test": "npm run lint && npm run test:unit",
+    "test:unit": "node test/logic.test.js && node test/store.test.js && node test/sync.test.js",
+    "test:rules": "firebase emulators:exec --only firestore --project warikan-ef6d0 \"node test/rules.test.js\"",
+    "test:e2e": "node test/e2e/run.js",
+    "test:e2e:emulator": "firebase emulators:exec --only auth,firestore --project warikan-ef6d0 \"node test/e2e/run.js --emulator\"",
+    "screenshots": "node test/visual/capture.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "eslint": "^9.39.0",
+    "firebase": "^13.4.0",
+    "firebase-tools": "^15.0.0",
+    "globals": "^15.15.0",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^24.0.0"
+  }
+}
